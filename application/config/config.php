@@ -23,7 +23,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
+<<<<<<< HEAD
 $config['base_url'] = 'http://localhost/malam/';
+=======
+$config['base_url'] = 'http://localhost/malam';
+>>>>>>> 7c7314ec804e894f31ec3ee997fd49daa454e6a6
 
 /*
 |--------------------------------------------------------------------------
