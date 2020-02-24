@@ -1,0 +1,65 @@
+Buatlah 2 Tabel
+Mahasiswa
+|nim|nama|alamat|id_matkul|
+Matkul
+|id_matkul|nama_matkul|sks|harga|
+
+
+$autoload['libraries'] = array('database');
+// 'database','email','session','form_validation'
+
+$autoload['helper'] = array('url');
+// 'url','file','security'
+
+Buatlah Class Model 
+
+function __construct(){
+		parent::__construct();		
+		$this->load->model('M_user');
+            
+	}
+class M_Mahasiswa extends CI_Model{
+
+  function tampil_data(){
+// return $this->db->get('user');
+$this->db->select('*');
+$this->db->from('user');
+$this->db->join('gender', 'gender.id_gender = user.jenis_kelamin');
+$query = $this->db->get();
+return $query;
+  }
+
+Buatlah Class Controller
+	  function index(){
+			$data['user'] = $this->M_user->tampil_data()->result();
+			$this->load->view('user/index',$data);
+		}
+
+Di View 
+buat Tabel
+<table style="margin:20px auto;" border="1">
+		<tr>
+			<th> No </th>
+			<th> Nama </th>
+			<th> Jenis Kelamin </th>
+			<th> Alamat </th>
+			<th> Pekerjaan </th>
+			<th> Action </th>
+		</tr>
+		<?php 
+		$no = 1;
+		foreach($user as $u){ 
+		?>
+		<tr>
+			<td><?php echo $no++ ?></td>
+			<td><?php echo $u->nama ?></td>
+			<td><?php echo $u->jenis ?></td>
+			<td><?php echo $u->alamat ?></td>
+			<td><?php echo $u->pekerjaan ?></td>
+			<td>
+			      <?php echo anchor('user/edit/'.$u->id,'Edit'); ?>
+                              <?php echo anchor('user/hapus/'.$u->id,'Hapus'); ?>
+			</td>
+		</tr>
+		<?php } ?>
+	</table>
