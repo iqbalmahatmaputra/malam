@@ -26,7 +26,7 @@ class Auth extends CI_Controller {
 	{
 		$data['pengguna'] = $this->M_pengguna->show_all()->result();
 		$this->load->view('templates/topbar',$data);
-		$this->load->view('templates/index',$data);
+		$this->load->view('auth/index',$data);
 		$this->load->view('templates/footer',$data);
     
 	}

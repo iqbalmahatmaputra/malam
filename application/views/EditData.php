@@ -41,7 +41,7 @@
 						<?php if($u->jk == 'Lelaki'){ ?>
 						<option value="Lelaki" selected>Lelaki</option>
 						<option value="Perempuan">Perempuan</option>
-						<?php }else{ ?>
+						<?php } else{ ?>
 							<option value="Lelaki">Lelaki</option>
 						<option value="Perempuan" selected>Perempuan</option>
 						<?php } ?>
@@ -59,10 +59,11 @@
 					<label for="kode_matkul">Mata Kuliah</label>
 					<select name="kode_matkul" id="kode_matkul" class="form-control custom-select">
 							<?= $matkul=$this->db->query("SELECT DISTINCT `matkul`.*, `matkul`.`nama_matkul`
-            FROM `matkul` JOIN `mahasiswa`")->result(); ?>
+          					  FROM `matkul` JOIN `mahasiswa`")->result(); ?>
 							<?php foreach($matkul as $key => $value) : 
 								if($value->kode_matkul == $u->kode_matkul){ ?>
-							<option value="<?= $value->kode_matkul ?>" selected><?= $value->nama_matkul;?></option>
+							<option value="<?= $value->kode_matkul ?>" selected><?= $value->nama_matkul;?>
+							</option>
 							<?php }else{ ?>
 							<option value="<?= $value->kode_matkul ?>"><?= $value->nama_matkul;?></option>
 						<?php	} endforeach; ?>
