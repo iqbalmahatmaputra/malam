@@ -24,17 +24,66 @@ class Auth extends CI_Controller {
 	}
 	public function index()
 	{
-		$data['title'] = 'Login Page!';
-		$this->load->view('templates/topbar',$data);
-		$this->load->view('auth/index',$data);
-		$this->load->view('templates/footer',$data);
-    
+			$this->form_validation->set_rules('name', 'Name', 'trim|required');
+			$this->form_validation->set_rules('password', 'Password', 'trim|required');
+			
+			if($this->form_validation->run() == false){
+			$data['title'] = 'Login Page';
+			$this->load->view('templates/topbar', $data);
+			$this->load->view('auth/index');
+			$this->load->view('templates/footer');
+		}
+	else{
+		// validasi sukses
+		// _ itu private klo di depannya
+		$this->_login();
 	}
+	}
+	
+private function _login(){
+    $name = $this->input->post('name');
+    $password = $this->input->post('password');
+
+    $user = $this->db->get_where('user', ['name' => $name])->row_array();
+        // user ada
+
+    if($user){
+        // user aktif
+        if($user['is_active'] == 1){
+            // cek password
+            if(password_verify($password, $user['password'])){
+                $data = [
+                    'name' => $user['name'],
+                    'role_id' => $user['role_id']
+                ];
+                $this->session->set_userdata($data);
+                // redirect('masalah'); klo mau nge gas
+                if ($user['role_id'] == 1){
+                    redirect('admin');
+                }
+                else {
+                    redirect('mahasiswa');
+                }
+            } else{
+        $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Password Salah!</div> ');
+        redirect('auth');
+            }
+        } else{
+        $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Akun Belum Pernah Terdaftar!</div> ');
+        redirect('auth');
+        }
+
+    } else {
+        // error
+        $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Akun Belum Pernah Terdaftar!</div> ');
+        redirect('auth');
+
+    }
+}
 	function register(){
-		
-   
-			$this->form_validation->set_rules('name', 'Name', 'required|trim');
-			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]', [
+			$this->form_validation->set_rules('name', 'Nama', 'required|trim');
+			$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email]', 
+			[
 				'is_unique' => 'Email ini sudah pernah daftar'
 			]);
 			$this->form_validation->set_rules('password1', 'Password', 'required|trim|min_length[3]|matches[password2]',['matches' => 'Password Kok Beda!','min_length' => 'Password pendek kali!']);
@@ -62,74 +111,19 @@ class Auth extends CI_Controller {
 					}
 
 	}
-	
-	public function insertData(){
-		// $data['namaMatkul'] = $this->M_mahasiswa->getNamaMatkul();
-		$data['namaMatkul'] = $this->db->get('matkul')->result_array();
-		$nim = $this->input->post('nim');
-		$nama = $this->input->post('nama');
-		$jk = $this->input->post('jk');
-		$alamat = $this->input->post('alamat');
-		$telfon = $this->input->post('telfon');
-		$kode_matkul = $this->input->post('kode_matkul');
-		$data = array(
-			'nim' => $nim,
-			'nama' => $nama,
-			'jk' =>  $jk,
-			'alamat' => $alamat,
-			'telfon' => $telfon,
-			'kode_matkul' => $kode_matkul
-		);
-		$this->db->insert('mahasiswa', $data);
-	
-		redirect('mahasiswa/index');
-	}
-	public function hapus_mahasiswa($nim){
-		$this->db->where('nim', $nim);
-		$this->db->delete('mahasiswa');
-		redirect('mahasiswa/index');
-	}
+	public function logout(){
+        $this->session->unset_userdata('name');
+        $this->session->unset_userdata('password1');
 
-	function delete($nim){
-		$this->db->where('nim', $nim);
-		$this->db->delete('mahasiswa');
-		redirect('mahasiswa/index');
-	}
-	function ubah_maha($nim){
-		echo "berhasil";
-	}
+        $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Selamat Gan! Akun sudah berhasil Logout!</div> ');
+        redirect('auth');
+    }
 
-	function ubah_mahasiswa($nim){
-		$where = array('nim' => $nim);
-		$data['mahasiswa'] = $this->M_mahasiswa->edit_data($where,'mahasiswa')->result();
-		$this->load->view('EditData',$data);
-	}
-  
-	 function update(){
-		$nim = $this->input->post('nim');
-		$nama = $this->input->post('nama');
-		$jk = $this->input->post('jk');
-		$alamat = $this->input->post('alamat');
-		$telfon = $this->input->post('telfon');
-		$kode_matkul = $this->input->post('kode_matkul');
-	 
-		$data = array(
-			'nim' => $nim,
-			'nama' => $nama,
-			'jk' =>  $jk,
-			'alamat' => $alamat,
-			'telfon' => $telfon,
-			'kode_matkul' => $kode_matkul
-		);
-	 
-		$where = array(
-			'nim' => $nim
-		);
-		// var_dump($where);
-		// die;
-	 
-		$this->M_mahasiswa->update_data($where,$data,'mahasiswa');
-		// $query = $this->M_mahasiswa->update_mahasiswa($data, $nim);
-		// redirect('mahasiswa/index');
-	}
+    public function blocked(){
+         $data['title'] = 'Blocked!';
+
+        $this->load->view('auth/blocked', $data);
+
+
+    }
 }
